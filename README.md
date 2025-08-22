@@ -63,9 +63,8 @@ POLYGON_API_KEY=your_polygon_api_key
 
 ### Starting the Application
 
-Navigate to the langchain directory and run:
+Navigate to the directory and run:
 ```bash
-cd langchain
 python agent.py
 ```
 
@@ -103,11 +102,9 @@ curl -X POST http://localhost:5000/api/financial-agent \
 
 ```
 financial-ai-agent/
-├── langchain/
-│   ├── agent.py          # Main Flask application and LangGraph agent
-│   └── index.html        # Web interface
+│── agent.py          # Main Flask application and LangGraph agent
+│── index.html        # Web interface
 ├── .env.example          # Environment variables template
-├── .gitignore           # Git ignore file
 ├── requirements.txt     # Python dependencies
 └── README.md           # This file
 ```
