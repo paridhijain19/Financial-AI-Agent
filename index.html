@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Agent</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #7f8c8d;
+            font-weight: 400;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .query-section {
+            margin-bottom: 30px;
+        }
+
+        .query-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e1e8ed;
+            background: #ffffff;
+            font-family: inherit;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.2s ease;
+        }
+
+        .query-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .query-input::placeholder {
+            color: #95a5a6;
+        }
+
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #2c3e50;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #34495e;
+        }
+
+        .btn-primary:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdb;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+            padding: 16px;
+            background: #ecf0f1;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .examples {
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+        }
+
+        .examples-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .example-query {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #7f8c8d;
+            background: #ffffff;
+            border: 1px solid #e1e8ed;
+            transition: all 0.2s ease;
+        }
+
+        .example-query:hover {
+            color: #2c3e50;
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+
+        .example-query:last-child {
+            margin-bottom: 0;
+        }
+
+        .response-section {
+            margin-top: 40px;
+            display: none;
+            background: #ffffff;
+            border: 1px solid #e1e8ed;
+        }
+
+        .response-header {
+            background: #f8f9fa;
+            padding: 16px 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .response-content {
+            padding: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        /* Markdown Styles */
+        .response-content h1,
+        .response-content h2,
+        .response-content h3,
+        .response-content h4,
+        .response-content h5,
+        .response-content h6 {
+            color: #2c3e50;
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .response-content h1 { font-size: 32px; }
+        .response-content h2 { font-size: 28px; }
+        .response-content h3 { font-size: 24px; }
+        .response-content h4 { font-size: 20px; }
+        .response-content h5 { font-size: 18px; }
+        .response-content h6 { font-size: 16px; }
+
+        .response-content p {
+            margin-bottom: 16px;
+            color: #34495e;
+            line-height: 1.7;
+        }
+
+        .response-content ul,
+        .response-content ol {
+            margin-bottom: 16px;
+            padding-left: 20px;
+        }
+
+        .response-content li {
+            margin-bottom: 8px;
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .response-content strong {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .response-content em {
+            font-style: italic;
+            color: #7f8c8d;
+        }
+
+        .response-content code {
+            background: #ecf0f1;
+            padding: 2px 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #e74c3c;
+        }
+
+        .response-content pre {
+            background: #2c3e50;
+            color: #ffffff;
+            padding: 16px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+
+        .response-content pre code {
+            background: none;
+            color: #ffffff;
+            padding: 0;
+        }
+
+        .response-content blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 16px;
+            margin-bottom: 16px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .response-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .response-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .response-content::-webkit-scrollbar-thumb {
+            background: #bdc3c7;
+        }
+
+        .response-content::-webkit-scrollbar-thumb:hover {
+            background: #95a5a6;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+            
+            .main-content {
+                padding: 30px 20px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 36px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Financial Agent</h1>
+            <p>AI-powered financial analysis and market insights</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="query-section">
+                <textarea 
+                    class="query-input" 
+                    placeholder="Ask about any stock analysis, market data, or financial metrics..."
+                    id="queryInput"
+                ></textarea>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" id="submitBtn" onclick="submitQuery()">
+                        Analyze
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearQuery()">
+                        Clear
+                    </button>
+                </div>
+                
+                <div class="loading" id="loading">
+                    Processing your query...
+                </div>
+            </div>
+
+            <div class="examples">
+                <div class="examples-title">Example Queries</div>
+                <div class="example-query" onclick="setQuery('Should I buy TSLA stock?')">
+                    Should I buy TSLA stock?
+                </div>
+                <div class="example-query" onclick="setQuery('Analyze NVDA fundamentals')">
+                    Analyze NVDA fundamentals
+                </div>
+                <div class="example-query" onclick="setQuery('What is the latest news for AAPL?')">
+                    What is the latest news for AAPL?
+                </div>
+                <div class="example-query" onclick="setQuery('Show me the last quote for MSFT')">
+                    Show me the last quote for MSFT
+                </div>
+                <div class="example-query" onclick="setQuery('Get technical indicators for GOOGL')">
+                    Get technical indicators for GOOGL
+                </div>
+            </div>
+
+            <div class="response-section" id="responseSection">
+                <div class="response-header">
+                    Analysis Result
+                </div>
+                <div class="response-content" id="responseContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setQuery(query) {
+            document.getElementById('queryInput').value = query;
+        }
+
+        function clearQuery() {
+            document.getElementById('queryInput').value = '';
+            document.getElementById('responseSection').style.display = 'none';
+        }
+
+        function renderMarkdown(text) {
+            try {
+                return marked.parse(text);
+            } catch (error) {
+                console.error('Error parsing markdown:', error);
+                return text.replace(/\n/g, '<br>');
+            }
+        }
+
+        async function submitQuery() {
+            const queryInput = document.getElementById('queryInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const responseSection = document.getElementById('responseSection');
+            const responseContent = document.getElementById('responseContent');
+
+            const query = queryInput.value.trim();
+            if (!query) {
+                alert('Please enter a query');
+                return;
+            }
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            loading.style.display = 'block';
+            responseSection.style.display = 'none';
+
+            try {
+                // Replace with your actual backend endpoint
+                const response = await fetch('/api/financial-agent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to get response from server');
+                }
+
+                const result = await response.json();
+                
+                // Render markdown content
+                const markdownContent = result.response || result.message || 'Analysis completed successfully';
+                responseContent.innerHTML = renderMarkdown(markdownContent);
+                responseSection.style.display = 'block';
+                
+                // Scroll to results
+                responseSection.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Error:', error);
+                const errorMessage = `**Error:** ${error.message}\n\n**Note:** This is a demo interface. Please connect to your Python backend at \`/api/financial-agent\` endpoint to get actual financial analysis.`;
+                responseContent.innerHTML = renderMarkdown(errorMessage);
+                responseSection.style.display = 'block';
+            } finally {
+                // Reset loading state
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Analyze';
+                loading.style.display = 'none';
+            }
+        }
+
+        // Allow Enter key to submit (Ctrl+Enter for new line)
+        document.getElementById('queryInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                submitQuery();
+            }
+        });
+
+        // Auto-resize textarea
+        const textarea = document.getElementById('queryInput');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+    </script>
+</body>
+</html>

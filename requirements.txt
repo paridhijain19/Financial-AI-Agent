@@ -1,0 +1,20 @@
+# Core dependencies
+python-dotenv
+flask
+flask-cors
+
+# LangChain and AI dependencies
+langchain
+langchain-google-genai
+langchain-community
+langgraph
+
+# Financial data and analysis
+yfinance
+pandas
+
+# Technical analysis
+ta
+
+# API utilities
+requests
